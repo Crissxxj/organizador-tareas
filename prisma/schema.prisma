@@ -46,6 +46,7 @@ model User {
   accounts Account[]
   sessions Session[]
   tasks    Task[]
+  subjects Subject[]
 }
 
 model VerificationToken {
@@ -70,6 +71,22 @@ enum TaskStatus {
   DONE
 }
 
+model Subject {
+  id        String   @id @default(cuid())
+  name      String
+  color     String   @default("#6366f1")
+  icon      String   @default("📘")
+  professor String?
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tasks  Task[]
+
+  @@unique([userId, name])
+  @@index([userId])
+}
+
 model Task {
   id                    String     @id @default(cuid())
   title                 String
@@ -77,7 +94,6 @@ model Task {
   startDate             DateTime?
   endDate               DateTime
   priority              Priority   @default(MEDIUM)
-  category              String?
   status                TaskStatus @default(PENDING)
   reminderMinutesBefore Int        @default(60)
   reminderSent          Boolean    @default(false)
@@ -90,5 +106,9 @@ model Task {
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  subjectId String?
+  subject   Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+
   @@index([userId])
+  @@index([subjectId])
 }

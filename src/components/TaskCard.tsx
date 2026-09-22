@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import type { Task, TaskStatus } from "@/types";
+import type { Task, TaskStatus, Subject } from "@/types";
 import { TaskForm, TaskFormValues } from "./TaskForm";
+import { SubjectBadge } from "./SubjectBadge";
+import type { SubjectFormValues } from "./SubjectForm";
 
 const PRIORITY_STYLES: Record<string, string> = {
   LOW: "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200",
@@ -38,12 +40,16 @@ function isOverdue(task: Task) {
 
 export function TaskCard({
   task,
+  subjects,
   onUpdate,
   onDelete,
+  onQuickCreateSubject,
 }: {
   task: Task;
+  subjects: Subject[];
   onUpdate: (id: string, values: Partial<TaskFormValues> | { status: TaskStatus }) => void;
   onDelete: (id: string) => void;
+  onQuickCreateSubject: (values: SubjectFormValues) => Promise<Subject | null>;
 }) {
   const [editing, setEditing] = useState(false);
 
@@ -51,6 +57,8 @@ export function TaskCard({
     return (
       <TaskForm
         initial={task}
+        subjects={subjects}
+        onQuickCreateSubject={onQuickCreateSubject}
         submitLabel="Guardar cambios"
         onCancel={() => setEditing(false)}
         onSubmit={(values) => {
@@ -61,11 +69,14 @@ export function TaskCard({
     );
   }
 
+  const accentColor = task.subject?.color;
+
   return (
     <div
-      className={`card flex flex-col gap-2 rounded-lg p-4 ${
+      className={`card flex flex-col gap-2 rounded-xl p-4 shadow-sm transition hover:shadow-md ${
         isOverdue(task) ? "border-red-400 dark:border-red-700" : ""
       }`}
+      style={accentColor ? { borderLeft: `4px solid ${accentColor}` } : undefined}
     >
       <div className="flex items-start justify-between gap-2">
         <h3
@@ -88,11 +99,7 @@ export function TaskCard({
 
       <div className="flex flex-wrap items-center gap-2 text-xs opacity-70">
         <span>📅 {formatDate(task.endDate)}</span>
-        {task.category && (
-          <span className="rounded-full bg-gray-100 px-2 py-0.5 dark:bg-gray-800">
-            {task.category}
-          </span>
-        )}
+        <SubjectBadge subject={task.subject} />
         {task.source === "github" && (
           <a
             href={task.sourceUrl || "#"}

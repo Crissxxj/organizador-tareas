@@ -11,15 +11,16 @@ export async function GET(request: Request) {
 
   const { searchParams } = new URL(request.url);
   const status = searchParams.get("status");
-  const category = searchParams.get("category");
+  const subjectId = searchParams.get("subjectId");
 
   const tasks = await prisma.task.findMany({
     where: {
       userId: (session.user as { id: string }).id,
       ...(status ? { status: status as "PENDING" | "IN_PROGRESS" | "DONE" } : {}),
-      ...(category ? { category } : {}),
+      ...(subjectId ? { subjectId } : {}),
     },
     orderBy: { endDate: "asc" },
+    include: { subject: true },
   });
 
   return NextResponse.json(tasks);
@@ -47,7 +48,7 @@ export async function POST(request: Request) {
       startDate: body.startDate ? new Date(body.startDate) : null,
       endDate: new Date(body.endDate),
       priority: body.priority || "MEDIUM",
-      category: body.category || null,
+      subjectId: body.subjectId || null,
       reminderMinutesBefore:
         typeof body.reminderMinutesBefore === "number"
           ? body.reminderMinutesBefore
@@ -56,6 +57,7 @@ export async function POST(request: Request) {
       sourceUrl: body.sourceUrl || null,
       userId: (session.user as { id: string }).id,
     },
+    include: { subject: true },
   });
 
   return NextResponse.json(task, { status: 201 });

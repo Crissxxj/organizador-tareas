@@ -4,24 +4,71 @@
 
 :root {
   --bg: 250 250 252;
+  --bg-accent: 238 238 252;
   --fg: 17 24 39;
   --card: 255 255 255;
   --border: 229 231 235;
 }
 
 .dark {
-  --bg: 15 17 22;
+  --bg: 13 15 20;
+  --bg-accent: 20 20 32;
   --fg: 229 231 235;
-  --card: 24 27 34;
-  --border: 39 42 50;
+  --card: 22 24 31;
+  --border: 38 41 50;
+}
+
+* {
+  border-color: rgb(var(--border));
 }
 
 body {
   background-color: rgb(var(--bg));
+  background-image: radial-gradient(
+    at top right,
+    rgb(var(--bg-accent) / 0.6),
+    transparent 55%
+  );
+  background-attachment: fixed;
   color: rgb(var(--fg));
 }
 
 .card {
   background-color: rgb(var(--card));
   border: 1px solid rgb(var(--border));
+  border-radius: 0.75rem;
+}
+
+input,
+textarea,
+select {
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: rgb(99 102 241);
+  box-shadow: 0 0 0 3px rgb(99 102 241 / 0.15);
+}
+
+button {
+  transition: background-color 150ms ease, opacity 150ms ease,
+    box-shadow 150ms ease, transform 100ms ease;
+}
+
+/* Thin, unobtrusive scrollbars for horizontal subject strips, etc. */
+::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgb(var(--border));
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
 }

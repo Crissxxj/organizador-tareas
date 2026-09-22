@@ -53,7 +53,11 @@ npm install
 npx prisma migrate dev --name init
 ```
 
-Esto crea todas las tablas (usuarios, sesiones, tareas) en tu base de datos.
+Esto crea todas las tablas (usuarios, sesiones, tareas, materias) en tu base
+de datos. Si ya tenías la base de datos creada de antes (sin materias),
+`prisma migrate dev` va a pedirte aplicar la migración `add_subjects`, que de
+paso convierte automáticamente cualquier categoría de texto que ya tuvieras
+en tareas antiguas en materias reales, sin perder datos.
 
 ## 6. Levantar la app
 
@@ -82,7 +86,12 @@ public/sw.js           → service worker mínimo (hace la app instalable)
 
 ## Funcionalidades incluidas
 
-- Tareas con fecha de inicio, fecha de finalización, prioridad, categoría y estado.
+- **Materias**: crea tus materias con nombre, color, ícono y profesor opcional,
+y clasifica cada tarea en una de ellas (desde el propio formulario de tarea,
+con alta rápida sin salir de él). La vista de Lista y Kanban muestran un
+resumen por materia con barra de progreso y filtro rápido. Se gestionan desde
+**Ajustes**.
+- Tareas con fecha de inicio, fecha de finalización, prioridad, materia y estado.
 - Recordatorios configurables (15 min a 2 días antes) vía notificaciones del navegador,
   mientras la app esté abierta en una pestaña.
 - Tres vistas: **Lista** (con filtros), **Kanban** (Pendiente/En progreso/Hecha) y

@@ -1,17 +1,20 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import type { Task, TaskStatus } from "@/types";
 import { TaskCard } from "@/components/TaskCard";
 import { TaskForm, TaskFormValues } from "@/components/TaskForm";
 import { ReminderWatcher } from "@/components/ReminderWatcher";
+import { SubjectSummary } from "@/components/SubjectSummary";
+import { useSubjects } from "@/hooks/useSubjects";
 
 export default function DashboardPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [statusFilter, setStatusFilter] = useState<TaskStatus | "ALL">("ALL");
-  const [categoryFilter, setCategoryFilter] = useState<string>("ALL");
+  const [subjectFilter, setSubjectFilter] = useState<string | "ALL">("ALL");
+  const { subjects, createSubject } = useSubjects();
 
   async function loadTasks() {
     setLoading(true);
@@ -24,14 +27,9 @@ export default function DashboardPage() {
     loadTasks();
   }, []);
 
-  const categories = useMemo(() => {
-    const set = new Set(tasks.map((t) => t.category).filter(Boolean) as string[]);
-    return Array.from(set);
-  }, [tasks]);
-
   const visibleTasks = tasks.filter((t) => {
     if (statusFilter !== "ALL" && t.status !== statusFilter) return false;
-    if (categoryFilter !== "ALL" && t.category !== categoryFilter) return false;
+    if (subjectFilter !== "ALL" && t.subjectId !== subjectFilter) return false;
     return true;
   });
 
@@ -66,12 +64,23 @@ export default function DashboardPage() {
     <div className="flex flex-col gap-4">
       <ReminderWatcher />
 
+      <SubjectSummary
+        subjects={subjects}
+        activeSubjectId={subjectFilter}
+        onSelect={setSubjectFilter}
+      />
+
       {showForm ? (
-        <TaskForm onSubmit={handleCreate} onCancel={() => setShowForm(false)} />
+        <TaskForm
+          subjects={subjects}
+          onQuickCreateSubject={createSubject}
+          onSubmit={handleCreate}
+          onCancel={() => setShowForm(false)}
+        />
       ) : (
         <button
           onClick={() => setShowForm(true)}
-          className="card rounded-lg px-4 py-3 text-left text-sm opacity-70 hover:opacity-100"
+          className="card rounded-xl px-4 py-3 text-left text-sm opacity-70 shadow-sm transition hover:opacity-100 hover:shadow-md"
         >
           ➕ Agregar una nueva tarea…
         </button>
@@ -88,19 +97,6 @@ export default function DashboardPage() {
           <option value="IN_PROGRESS">En progreso</option>
           <option value="DONE">Hecha</option>
         </select>
-
-        <select
-          value={categoryFilter}
-          onChange={(e) => setCategoryFilter(e.target.value)}
-          className="rounded-md border border-gray-300 bg-transparent px-3 py-1.5 text-sm dark:border-gray-700"
-        >
-          <option value="ALL">Todas las categorías</option>
-          {categories.map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
-          ))}
-        </select>
       </div>
 
       {loading ? (
@@ -113,8 +109,10 @@ export default function DashboardPage() {
             <TaskCard
               key={task.id}
               task={task}
+              subjects={subjects}
               onUpdate={handleUpdate}
               onDelete={handleDelete}
+              onQuickCreateSubject={createSubject}
             />
           ))}
         </div>

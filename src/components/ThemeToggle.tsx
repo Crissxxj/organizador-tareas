@@ -20,7 +20,7 @@ export function ThemeToggle() {
     <button
       onClick={toggle}
       aria-label="Cambiar tema"
-      className="rounded-md border border-gray-300 px-3 py-1.5 text-sm dark:border-gray-700"
+      className="rounded-full border border-gray-300 px-3 py-1.5 text-sm transition hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800"
     >
       {isDark ? "☀️ Claro" : "🌙 Oscuro"}
     </button>
