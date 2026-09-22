@@ -4,11 +4,14 @@ import { signIn } from "next-auth/react";
 
 export default function LoginPage() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-6 px-4 text-center">
-      <div className="space-y-2">
+    <main className="flex min-h-screen flex-col items-center justify-center gap-6 bg-gradient-to-br from-indigo-50 via-white to-fuchsia-50 px-4 text-center dark:from-[#0d0f14] dark:via-[#0d0f14] dark:to-[#181321]">
+      <div className="space-y-3">
+        <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-brand to-fuchsia-500 text-2xl text-white shadow-md">
+          📋
+        </span>
         <h1 className="text-3xl font-bold">Organizador de Tareas</h1>
         <p className="text-sm opacity-70">
-          Tus tareas, fechas y recordatorios, todo en un solo lugar.
+          Tus tareas, materias, fechas y recordatorios, todo en un solo lugar.
         </p>
       </div>
 

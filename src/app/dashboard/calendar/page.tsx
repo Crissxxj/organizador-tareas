@@ -15,12 +15,17 @@ import {
 } from "date-fns";
 import { es } from "date-fns/locale";
 import type { Task } from "@/types";
+import { SubjectBadge } from "@/components/SubjectBadge";
 
 const PRIORITY_DOT: Record<string, string> = {
   LOW: "bg-gray-400",
   MEDIUM: "bg-amber-500",
   HIGH: "bg-red-500",
 };
+
+function dotColor(task: Task) {
+  return task.subject?.color;
+}
 
 export default function CalendarPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -53,7 +58,7 @@ export default function CalendarPage() {
       <div className="flex items-center justify-between">
         <button
           onClick={() => setCursor(subMonths(cursor, 1))}
-          className="rounded-md border border-gray-300 px-3 py-1.5 text-sm dark:border-gray-700"
+          className="rounded-md border border-gray-300 px-3 py-1.5 text-sm transition hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800"
         >
           ← Anterior
         </button>
@@ -62,7 +67,7 @@ export default function CalendarPage() {
         </h2>
         <button
           onClick={() => setCursor(addMonths(cursor, 1))}
-          className="rounded-md border border-gray-300 px-3 py-1.5 text-sm dark:border-gray-700"
+          className="rounded-md border border-gray-300 px-3 py-1.5 text-sm transition hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800"
         >
           Siguiente →
         </button>
@@ -81,18 +86,27 @@ export default function CalendarPage() {
             <button
               key={day.toISOString()}
               onClick={() => setSelectedDay(day)}
-              className={`card flex min-h-[64px] flex-col items-start gap-1 rounded-md p-1.5 text-left text-xs ${
+              className={`card flex min-h-[64px] flex-col items-start gap-1 rounded-md p-1.5 text-left text-xs transition hover:shadow-md ${
                 !isSameMonth(day, cursor) ? "opacity-30" : ""
               } ${isSameDay(day, new Date()) ? "border-brand" : ""}`}
             >
               <span>{format(day, "d")}</span>
               <div className="flex flex-wrap gap-0.5">
-                {dayTasks.slice(0, 4).map((t) => (
-                  <span
-                    key={t.id}
-                    className={`h-1.5 w-1.5 rounded-full ${PRIORITY_DOT[t.priority]}`}
-                  />
-                ))}
+                {dayTasks.slice(0, 4).map((t) => {
+                  const color = dotColor(t);
+                  return color ? (
+                    <span
+                      key={t.id}
+                      className="h-1.5 w-1.5 rounded-full"
+                      style={{ backgroundColor: color }}
+                    />
+                  ) : (
+                    <span
+                      key={t.id}
+                      className={`h-1.5 w-1.5 rounded-full ${PRIORITY_DOT[t.priority]}`}
+                    />
+                  );
+                })}
               </div>
             </button>
           );
@@ -100,18 +114,26 @@ export default function CalendarPage() {
       </div>
 
       {selectedDay && (
-        <div className="card rounded-lg p-4">
+        <div className="card rounded-lg p-4 shadow-sm">
           <h3 className="mb-2 font-medium">
             {format(selectedDay, "EEEE d 'de' MMMM", { locale: es })}
           </h3>
           {tasksByDay(selectedDay).length === 0 ? (
             <p className="text-sm opacity-60">No hay tareas ese día.</p>
           ) : (
-            <ul className="flex flex-col gap-1 text-sm">
+            <ul className="flex flex-col gap-2 text-sm">
               {tasksByDay(selectedDay).map((t) => (
                 <li key={t.id} className="flex items-center gap-2">
-                  <span className={`h-2 w-2 rounded-full ${PRIORITY_DOT[t.priority]}`} />
-                  {t.title}
+                  <span
+                    className={`h-2 w-2 shrink-0 rounded-full ${
+                      !dotColor(t) ? PRIORITY_DOT[t.priority] : ""
+                    }`}
+                    style={dotColor(t) ? { backgroundColor: dotColor(t) } : undefined}
+                  />
+                  <span className={t.status === "DONE" ? "line-through opacity-50" : ""}>
+                    {t.title}
+                  </span>
+                  <SubjectBadge subject={t.subject} />
                 </li>
               ))}
             </ul>

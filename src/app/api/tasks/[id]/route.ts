@@ -36,13 +36,14 @@ export async function PATCH(
         : {}),
       ...(body.endDate !== undefined ? { endDate: new Date(body.endDate) } : {}),
       ...(body.priority !== undefined ? { priority: body.priority } : {}),
-      ...(body.category !== undefined ? { category: body.category } : {}),
+      ...(body.subjectId !== undefined ? { subjectId: body.subjectId || null } : {}),
       ...(body.status !== undefined ? { status: body.status } : {}),
       ...(body.reminderMinutesBefore !== undefined
         ? { reminderMinutesBefore: body.reminderMinutesBefore }
         : {}),
       ...(body.reminderSent !== undefined ? { reminderSent: body.reminderSent } : {}),
     },
+    include: { subject: true },
   });
 
   return NextResponse.json(task);
